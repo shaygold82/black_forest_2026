@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>היער השחור ושוויץ — אוגוסט 2026</title>
+  <meta name="description" content="מסלול טיול משפחתי ליער השחור, שטרסבורג וציריך. 12-23 באוגוסט 2026." />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwindcss.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Rubik', 'Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            surface: {
+              50: '#fafafa',
+              100: '#f5f5f5',
+              200: '#e5e5e5',
+              300: '#d4d4d4',
+              400: '#a3a3a3',
+              500: '#737373',
+              600: '#525252',
+              700: '#404040',
+              800: '#262626',
+              900: '#171717',
+              950: '#0a0a0a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Rubik', 'Inter', system-ui, sans-serif;
+      background: #fafafa;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .accordion-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.35s ease;
+      opacity: 0;
+    }
+    .accordion-body.open {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    .accordion-inner { overflow: hidden; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .day-item {
+      animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .day-header:active { transform: scale(0.985); }
+    .day-header { transition: transform 0.15s ease, background-color 0.2s ease; }
+
+    .chevron { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    .chevron.rotated { transform: rotate(180deg); }
+
+    .detail-line { position: relative; padding-right: 1rem; }
+    .detail-line::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0.6em;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #d4d4d4;
+    }
+
+    .day-badge { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
+
+    .map-container {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .place-chip {
+      transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .place-chip:hover {
+      background: #171717;
+      color: #fafafa;
+    }
+    .place-chip.active {
+      background: #171717;
+      color: #fafafa;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+
+    .map-frame {
+      border-radius: 12px;
+      transition: opacity 0.3s ease;
+    }
+
+    ::-webkit-scrollbar { width: 0px; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-surface-50 text-surface-900" x-data="itinerary()">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-surface-50/80 border-b border-surface-200/60">
+    <div class="max-w-lg mx-auto px-5 py-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-lg font-semibold tracking-tight text-surface-900">היער השחור ושוויץ</h1>
+          <p class="text-xs font-light text-surface-400 mt-0.5">12–23 באוגוסט 2026 · 12 ימים</p>
+        </div>
+        <button
+          @click="expandAll = !expandAll; openDays = expandAll ? days.map((_, i) => i) : []"
+          class="text-xs text-surface-400 hover:text-surface-600 transition-colors px-3 py-1.5 rounded-full border border-surface-200 hover:border-surface-300"
+          x-text="expandAll ? 'כווץ הכל' : 'הרחב הכל'"
+        ></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-lg mx-auto px-5 pb-20 pt-4">
+
+    <!-- Trip overview -->
+    <div class="flex items-center gap-3 mb-6 px-1">
+      <div class="flex items-center gap-1.5 text-xs text-surface-400">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+        </svg>
+        <span>שוויץ · גרמניה · צרפת</span>
+      </div>
+      <div class="w-px h-3 bg-surface-200"></div>
+      <div class="flex items-center gap-1.5 text-xs text-surface-400">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+        <span>12 ימים</span>
+      </div>
+    </div>
+
+    <!-- Days -->
+    <div class="space-y-2">
+      <template x-for="(day, index) in days" :key="index">
+        <div
+          class="day-item rounded-2xl bg-white"
+          :style="`animation-delay: ${index * 0.04}s`"
+          :class="isOpen(index) ? 'shadow-sm ring-1 ring-surface-900/[0.04]' : 'shadow-[0_1px_2px_rgba(0,0,0,0.04)] ring-1 ring-surface-900/[0.03]'"
+        >
+          <!-- Header -->
+          <button
+            class="day-header w-full text-right px-5 py-4 flex items-center gap-4 rounded-2xl"
+            :class="isOpen(index) ? 'pb-0' : ''"
+            @click="toggle(index)"
+            :id="'day-' + index"
+          >
+            <div class="flex flex-col items-center flex-shrink-0 w-10">
+              <span class="day-badge text-2xl font-semibold text-surface-900 leading-none" x-text="day.date.split('/')[0]"></span>
+              <span class="text-[10px] font-light text-surface-400 mt-0.5" x-text="getWeekday(day.date)"></span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-surface-800 truncate" x-text="day.title"></p>
+              <p class="text-[11px] text-surface-400 mt-0.5" x-text="getSubtitle(day)"></p>
+            </div>
+            <svg
+              class="w-4 h-4 text-surface-300 chevron flex-shrink-0"
+              :class="isOpen(index) ? 'rotated' : ''"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+
+          <!-- Body -->
+          <div class="accordion-body" :class="isOpen(index) ? 'open' : ''">
+            <div class="accordion-inner">
+              <div class="px-5 pt-3 pb-5">
+
+                <!-- Details -->
+                <div class="mr-14 border-t border-surface-100 pt-3">
+                  <template x-for="(line, li) in getDetailLines(day.details)" :key="li">
+                    <div class="detail-line py-1.5">
+                      <p class="text-[13px] leading-relaxed text-surface-600 font-light" x-text="line"></p>
+                    </div>
+                  </template>
+                </div>
+
+                <!-- Tags -->
+                <div class="mr-14 mt-3 flex flex-wrap gap-1.5" x-show="getTags(day).length > 0">
+                  <template x-for="(tag, ti) in getTags(day)" :key="ti">
+                    <span class="inline-flex items-center gap-1 text-[10px] font-medium text-surface-400 bg-surface-100 rounded-full px-2.5 py-1">
+                      <span x-html="tag.icon"></span>
+                      <span x-text="tag.label"></span>
+                    </span>
+                  </template>
+                </div>
+
+                <!-- Places -->
+                <template x-if="day.places && day.places.length > 0">
+                  <div class="mr-14 mt-4">
+                    <p class="text-[10px] font-medium text-surface-300 uppercase tracking-widest mb-2">מקומות</p>
+                    <div class="flex flex-wrap gap-1.5">
+                      <template x-for="(place, pi) in day.places" :key="pi">
+                        <button
+                          class="place-chip inline-flex items-center gap-1.5 text-[12px] font-normal text-surface-600 bg-surface-100 rounded-full px-3 py-1.5 cursor-pointer"
+                          :class="activeMap[index] === pi ? 'active' : ''"
+                          @click.stop="showMap(index, pi)"
+                        >
+                          <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                          </svg>
+                          <span x-text="place.name"></span>
+                        </button>
+                      </template>
+                    </div>
+
+                    <!-- Embedded Map -->
+                    <template x-if="activeMap[index] !== null && activeMap[index] !== undefined">
+                      <div class="mt-3 relative">
+                        <div class="flex items-center justify-between mb-2">
+                          <a
+                            :href="'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(day.places[activeMap[index]].query)"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1 text-[11px] text-surface-400 hover:text-surface-600 transition-colors"
+                          >
+                            <span>פתח ב-Google Maps</span>
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                            </svg>
+                          </a>
+                          <button
+                            @click.stop="activeMap[index] = null"
+                            class="text-surface-300 hover:text-surface-500 transition-colors p-1"
+                          >
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <iframe
+                          class="map-frame w-full bg-surface-100"
+                          style="height: 220px; border: none;"
+                          loading="lazy"
+                          referrerpolicy="no-referrer-when-downgrade"
+                          :src="'https://maps.google.com/maps?q=' + encodeURIComponent(day.places[activeMap[index]].query) + '&t=m&z=14&ie=UTF8&iwloc=&output=embed'"
+                          allowfullscreen
+                        ></iframe>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <div class="mt-8 text-center">
+      <p class="text-[11px] text-surface-300 font-light">נסיעה טובה! 🖤</p>
+    </div>
+  </main>
+
+  <script>
+    function itinerary() {
+      return {
+        openDays: [],
+        expandAll: false,
+        activeMap: {},
+
+        days: [
+          {
+            date: "12/08/2026",
+            title: "הגעה שוויץ",
+            details: "טיסת סוויס LX253 מתל אביב לציריך. המראה: 18:15, נחיתה: 21:35. \nלינה: Leonardo Hotel Zurich Airport.",
+            places: [
+              { name: "נמל התעופה ציריך", query: "Zurich Airport ZRH" },
+              { name: "Leonardo Hotel Zurich Airport", query: "Leonardo Hotel Zurich Airport" }
+            ]
+          },
+          {
+            date: "13/08/2026",
+            title: "איסוף רכב ונסיעה לנאורייד",
+            details: "09:00: איסוף רכב מהרץ, נמל התעופה ציריך.\nנסיעה: שעתיים לדירה ב-Neuried, גרמניה. התארגנות ב-Airbnb.",
+            places: [
+              { name: "הרץ נמל התעופה ציריך", query: "Hertz Zurich Airport" },
+              { name: "Neuried, גרמניה", query: "Neuried, Baden-Württemberg, Germany" }
+            ]
+          },
+          {
+            date: "14/08/2026",
+            title: "גוטאך",
+            details: "נסיעה: 45 דקות.\nאתר 1: מוזיאון פתוח Vogtsbauernhof (09:00-18:00).\nאתר 2: מגלשות הרים Sommerrodelbahn Gutach.",
+            places: [
+              { name: "מוזיאון Vogtsbauernhof", query: "Schwarzwälder Freilichtmuseum Vogtsbauernhof, Gutach" },
+              { name: "מגלשות Sommerrodelbahn", query: "Sommerrodelbahn Gutach, Gutach im Schwarzwald" }
+            ]
+          },
+          {
+            date: "15/08/2026",
+            title: "מפלי טריברג",
+            details: "נסיעה: 60 דקות.\nאתר 1: מפלי טריברג (כניסה ראשית, מסלול בעלייה, פתוח כל היום).\nאתר 2: שעון הקוקייה הגדול בעולם ב-Schonach.",
+            places: [
+              { name: "מפלי טריברג", query: "Triberger Wasserfälle, Triberg" },
+              { name: "שעון הקוקייה הגדול בעולם", query: "Erste Weltgrößte Kuckucksuhr, Schonach im Schwarzwald" }
+            ]
+          },
+          {
+            date: "16/08/2026",
+            title: "פרייבורג",
+            details: "נסיעה: 50 דקות.\nפעילות: יום ראשון, חנויות סגורות. סיור בעיר העתיקה והשטת סירות עץ בתעלות ה-Bächle. הכל נגיש לעגלה.",
+            places: [
+              { name: "העיר העתיקה, פרייבורג", query: "Freiburg Altstadt, Freiburg im Breisgau" },
+              { name: "תעלות ה-Bächle", query: "Freiburger Bächle, Freiburg im Breisgau" }
+            ]
+          },
+          {
+            date: "17/08/2026",
+            title: "פארק מים Badeparadies / מונדנהוף",
+            details: "נסיעה לבאדפרדייז: שעה ורבע. מתחם Galaxy פתוח 09:00-22:00. דורש הזמנת כרטיסים.\nחלופה: פארק מונדנהוף, 35 דקות נסיעה. פתוח תמיד, תשלום על חניה בלבד.",
+            places: [
+              { name: "Badeparadies Schwarzwald", query: "Badeparadies Schwarzwald, Titisee-Neustadt" },
+              { name: "פארק מונדנהוף", query: "Mundenhof, Freiburg im Breisgau" }
+            ]
+          },
+          {
+            date: "18/08/2026",
+            title: "אירופה פארק",
+            details: "נסיעה: 25 דקות.\nפתוח: 09:00 עד 18:00 (לפחות). כרטיסים מוזמנים מראש. יום אינטנסיבי.",
+            places: [
+              { name: "אירופה פארק", query: "Europa-Park, Rust, Germany" }
+            ]
+          },
+          {
+            date: "19/08/2026",
+            title: "שטרסבורג, צרפת",
+            details: "נסיעה: 40 דקות (חניה ב-P+R).\nפעילות: שייט תעלות Batorama (חובה להזמין מראש לשעה ספציפית) וסיור בצרפת הקטנה.",
+            places: [
+              { name: "שייט Batorama", query: "Batorama, Strasbourg" },
+              { name: "צרפת הקטנה", query: "Petite France, Strasbourg" }
+            ]
+          },
+          {
+            date: "20/08/2026",
+            title: "פאני-וורלד",
+            details: "נסיעה: 25 דקות.\nפתוח: 10:00-18:00. פארק שעשועים קומפקטי לילדים קטנים.",
+            places: [
+              { name: "Funny World", query: "Funny-World Familienfreizeitpark, Kappel-Grafenhausen" }
+            ]
+          },
+          {
+            date: "21/08/2026",
+            title: "חזרה לציריך",
+            details: "נסיעה: כשעתיים מנאורייד לציריך.\n19:00: החזרת רכב בהרץ ציריך נמל תעופה.\nלינה: Aparthotel Adagio Zurich City Center.",
+            places: [
+              { name: "הרץ נמל התעופה ציריך", query: "Hertz Zurich Airport" },
+              { name: "Aparthotel Adagio Zurich", query: "Aparthotel Adagio Zurich City Center" }
+            ]
+          },
+          {
+            date: "22/08/2026",
+            title: "סיור בציריך",
+            details: "יום רגלי במרכז העיר, העיר העתיקה, ואגם ציריך. תחבורה ציבורית בלבד.",
+            places: [
+              { name: "העיר העתיקה, ציריך", query: "Zurich Altstadt, Zurich" },
+              { name: "אגם ציריך", query: "Zürichsee, Zurich" }
+            ]
+          },
+          {
+            date: "23/08/2026",
+            title: "טיסה חזרה",
+            details: "טיסת סוויס LX252.\nהמראה מציריך: 11:50.\nנחיתה בתל אביב: 17:00.",
+            places: [
+              { name: "נמל התעופה ציריך", query: "Zurich Airport ZRH" }
+            ]
+          }
+        ],
+
+        isOpen(index) {
+          return this.openDays.includes(index);
+        },
+
+        toggle(index) {
+          if (this.isOpen(index)) {
+            this.openDays = this.openDays.filter(i => i !== index);
+          } else {
+            this.openDays.push(index);
+          }
+        },
+
+        showMap(dayIndex, placeIndex) {
+          if (this.activeMap[dayIndex] === placeIndex) {
+            this.activeMap[dayIndex] = null;
+          } else {
+            this.activeMap[dayIndex] = placeIndex;
+          }
+        },
+
+        getWeekday(dateStr) {
+          const parts = dateStr.split('/');
+          const d = new Date(parts[2], parts[1] - 1, parts[0]);
+          const weekdays = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+          return weekdays[d.getDay()];
+        },
+
+        getDetailLines(details) {
+          return details.split('\n').filter(l => l.trim());
+        },
+
+        getSubtitle(day) {
+          const d = day.details.toLowerCase();
+          if (d.includes('טיסת') || d.includes('טיסה')) return '✈️  טיסה';
+          if (d.includes('נסיעה:')) {
+            const match = day.details.match(/נסיעה:\s*([^\.]+)/);
+            if (match) return '🚗  ' + match[1].trim();
+          }
+          if (d.includes('יום רגלי') || d.includes('תחבורה ציבורית')) return '🚶  יום רגלי';
+          return '';
+        },
+
+        getTags(day) {
+          const tags = [];
+          const d = day.details;
+          if (d.includes('כרטיסים') || d.includes('הזמנת כרטיסים') || d.includes('להזמין מראש')) {
+            tags.push({ label: 'הזמנה מראש', icon: '<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" /></svg>' });
+          }
+          if (d.includes('לינה:') || d.includes('Airbnb') || d.includes('Hotel') || d.includes('Aparthotel')) {
+            tags.push({ label: 'לינה', icon: '<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>' });
+          }
+          if (d.includes('נגיש לעגלה')) {
+            tags.push({ label: 'נגיש לעגלה', icon: '<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>' });
+          }
+          if (d.includes('חנויות סגורות')) {
+            tags.push({ label: 'חנויות סגורות', icon: '<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>' });
+          }
+          return tags;
+        }
+      };
+    }
+  </script>
+
+</body>
+</html>

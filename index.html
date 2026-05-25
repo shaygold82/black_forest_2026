@@ -91,6 +91,64 @@
 
     .day-badge { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }
 
+    /* Countdown */
+    .countdown-card {
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #111 100%);
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .countdown-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 0%, rgba(255,255,255,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .countdown-unit {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: 'tnum';
+    }
+    .countdown-num {
+      font-size: 2.25rem;
+      font-weight: 600;
+      line-height: 1;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .countdown-label {
+      font-size: 9px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-top: 4px;
+    }
+    .countdown-divider {
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.15);
+      line-height: 1;
+      margin-bottom: 18px;
+    }
+    @keyframes pulse-sec {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
+    .pulse-sec { animation: pulse-sec 1s ease-in-out infinite; }
+
+    @keyframes shimmer {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .shimmer-line {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
     .map-container {
       transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       overflow: hidden;
@@ -136,6 +194,51 @@
       </div>
     </div>
   </header>
+
+  <!-- Countdown Banner -->
+  <div class="max-w-lg mx-auto px-5 pt-4 pb-2">
+    <div class="countdown-card p-5">
+      <div class="shimmer-line"></div>
+      <!-- Header row -->
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <svg class="w-3.5 h-3.5 text-white/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+          </svg>
+          <span class="text-[11px] font-medium text-white/40 tracking-wide">LX253 · ת"א ← ציריך</span>
+        </div>
+        <span class="text-[10px] text-white/25 font-light">12.08.2026 · 18:15</span>
+      </div>
+
+      <!-- Countdown digits -->
+      <div class="flex items-end justify-center gap-1" x-data="countdown()" x-init="start()">
+        <div class="countdown-unit text-center">
+          <div class="countdown-num" x-text="String(days).padStart(2,'0')">--</div>
+          <div class="countdown-label">ימים</div>
+        </div>
+        <div class="countdown-divider pb-5">:</div>
+        <div class="countdown-unit text-center">
+          <div class="countdown-num" x-text="String(hours).padStart(2,'0')">--</div>
+          <div class="countdown-label">שעות</div>
+        </div>
+        <div class="countdown-divider pb-5">:</div>
+        <div class="countdown-unit text-center">
+          <div class="countdown-num" x-text="String(minutes).padStart(2,'0')">--</div>
+          <div class="countdown-label">דקות</div>
+        </div>
+        <div class="countdown-divider pb-5">:</div>
+        <div class="countdown-unit text-center">
+          <div class="countdown-num pulse-sec" x-text="String(seconds).padStart(2,'0')">--</div>
+          <div class="countdown-label">שניות</div>
+        </div>
+      </div>
+
+      <!-- Departed state -->
+      <template x-if="departed">
+        <p class="text-center text-white/50 text-sm py-2">✈️ טסנו! נסיעה טובה!</p>
+      </template>
+    </div>
+  </div>
 
   <!-- Main -->
   <main class="max-w-lg mx-auto px-5 pb-20 pt-4">
@@ -456,6 +559,40 @@
             tags.push({ label: 'חנויות סגורות', icon: '<svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>' });
           }
           return tags;
+        }
+      };
+    }
+
+    function countdown() {
+      // Flight: Aug 12 2026, 18:15 Israel time (Asia/Jerusalem = UTC+3 in summer)
+      const FLIGHT_UTC = new Date('2026-08-12T15:15:00Z').getTime();
+
+      return {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        departed: false,
+        _timer: null,
+
+        start() {
+          this.tick();
+          this._timer = setInterval(() => this.tick(), 1000);
+        },
+
+        tick() {
+          const now = Date.now();
+          const diff = FLIGHT_UTC - now;
+          if (diff <= 0) {
+            this.days = 0; this.hours = 0; this.minutes = 0; this.seconds = 0;
+            this.departed = true;
+            clearInterval(this._timer);
+            return;
+          }
+          this.days    = Math.floor(diff / 86400000);
+          this.hours   = Math.floor((diff % 86400000) / 3600000);
+          this.minutes = Math.floor((diff % 3600000)  / 60000);
+          this.seconds = Math.floor((diff % 60000)    / 1000);
         }
       };
     }

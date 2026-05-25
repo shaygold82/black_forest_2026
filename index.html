@@ -210,8 +210,11 @@
         <span class="text-[10px] text-white/25 font-light">12.08.2026 · 18:15</span>
       </div>
 
+      <!-- Headline -->
+      <p class="text-center text-white/70 text-base font-medium mb-4 tracking-wide">זמן לטיסה</p>
+
       <!-- Countdown digits -->
-      <div class="flex items-end justify-center gap-1" x-data="countdown()" x-init="start()">
+      <div class="flex items-end justify-center gap-1" dir="ltr" x-data="countdown()" x-init="start()">
         <div class="countdown-unit text-center">
           <div class="countdown-num" x-text="String(days).padStart(2,'0')">--</div>
           <div class="countdown-label">ימים</div>
